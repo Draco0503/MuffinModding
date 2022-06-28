@@ -1,9 +1,14 @@
-# Fabric Example Mod
+# MuffinModding
+By Draco0503
+## Description
+Its a simple mod, developed on [FabricMC](https://github.com/FabricMC) `version 1.19`, that starts a Discord bot who works as a `ChatBridge` with the chat from the Minecraft server and the Discord channel set on `mixin/discord/DiscordMixin.java#44`.
 
-## Setup
+Adding the new Minecraft server commands:
 
-For setup instructions please see the [fabric wiki page](https://fabricmc.net/wiki/tutorial:setup) that relates to the IDE that you are using.
+* /discord setBot: Sets up the bot if not.
+* /discord start: Starts the bot if not.
+* /discord stop: Stops the bot if not.
 
-## License
+This mod also includes customizable Minecraft chat messages, see `mixin/discord/ChatMixin.java`. It does not work on Advancement and Non-mod Commands.
 
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+Please notify me of any errors or bugs.
