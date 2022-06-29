@@ -83,7 +83,7 @@ public class DiscordListener extends ListenerAdapter {
 
     public static void sendMessage(String msg){
         if (chatBridge && channel != null){
-            channel.sendMessage(msg);
+            channel.sendMessage(msg).queue();
         }
     }
     public EmbedBuilder embedMsg(String msg) {
