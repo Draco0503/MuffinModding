@@ -4,7 +4,6 @@ import com.muffin.utils.ConsoleColors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -43,7 +42,7 @@ public class DiscordListener extends ListenerAdapter {
             chatBridge = true;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("[ERROR]: bot not set yet");
         }
     }
 
@@ -60,22 +59,20 @@ public class DiscordListener extends ListenerAdapter {
             if (event.getMessage().getContentDisplay().equals("!online")) {
                 StringBuilder msg = new StringBuilder();
                 for (ServerPlayerEntity player : ms.getPlayerManager().getPlayerList()){
-                    msg.append("# _"+player.getName().getString().replace("_", "\\_")+"_").append("\n");
+                    msg.append("# _").append(player.getName().getString().replace("_", "\\_")).append("_").append("\n");
                 }
                 event.getChannel().sendMessageEmbeds(embedMsg(msg.toString()).build()).queue();
 
             } else {
                 if (event.getMessage().getContentDisplay().equals("")) return;
                 MutableText finalMsg = Text.literal("");
-                finalMsg.append(Text.literal("[DC]").styled(style -> style.withColor(Formatting.DARK_GRAY)));
+                finalMsg.append(Text.literal("[DC]").styled(style -> style.withColor(Formatting.GRAY).withBold(true)));
                 String user = "["+ Objects.requireNonNull(event.getMember()).getEffectiveName()+"]: ";
                 String msg = event.getMessage().getContentDisplay();
-                finalMsg.append(Text.literal(user).styled(style -> style.withColor(Formatting.DARK_AQUA)));
-                finalMsg.append(Text.literal(msg).styled(style -> style.withColor(Formatting.WHITE)));
+                finalMsg.append(Text.literal(user).styled(style -> style.withColor(Formatting.DARK_AQUA).withBold(false)));
+                finalMsg.append(Text.literal(msg).styled(style -> style.withColor(Formatting.WHITE).withBold(false)));
                 ms.getPlayerManager().broadcast(finalMsg, MessageType.SYSTEM);
             }
-        } else if (!event.getGuild().getId().equals("")) {
-            System.err.println("!chatbridge||!channelIncorrect");
         }
     }
 

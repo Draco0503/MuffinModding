@@ -5,7 +5,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import com.muffin.MuffinModding;
 import com.muffin.discord.DiscordListener;
-import net.dv8tion.jda.api.entities.Activity;
+import com.muffin.utils.JSONFile;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.ClientConnection;
@@ -27,8 +27,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.math.BigInteger;
-
 
 public class DiscordMixin {
 
@@ -40,11 +38,10 @@ public class DiscordMixin {
         public void runBot(CallbackInfo ci) {
             try {
                 // here you put the DiscordBot token and the channel Id where you want to use as a bridge
-                String token = "";
-                String channelId = "";
-                DiscordListener.connect((MinecraftServer) (Object) this, token, channelId);
+                String[] data = JSONFile.getDataFile();
+                DiscordListener.connect((MinecraftServer) (Object) this, data[0], data[1]);
             } catch (Exception e) {
-                System.err.println("[ERROR]: Could not parse token or channelId");
+                System.err.println("[ERROR]: File not created");
             }
         }
 

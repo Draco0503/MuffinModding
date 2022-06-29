@@ -27,7 +27,7 @@ public class ChatMixin {
         @ModifyArg(method = "onDisconnected", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Lnet/minecraft/util/registry/RegistryKey;)V"))
         public Text onLeftMsg(Text message) {
             String[] old = message.getString().split("[ ]");
-            MutableText finalMsg = Text.literal("[-] ").styled(style -> style.withColor(Formatting.DARK_RED).withBold(true));
+            MutableText finalMsg = Text.literal("[-]").styled(style -> style.withColor(Formatting.DARK_RED).withBold(true));
             int i= 0;
             StringBuilder name = new StringBuilder();
             while (!old[i].equals("left")) {
@@ -41,11 +41,11 @@ public class ChatMixin {
 
         @Redirect(method = "handleDecoratedMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/server/filter/FilteredMessage;Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/util/registry/RegistryKey;)V"))
         public void chatMsgModifier(PlayerManager instance, FilteredMessage<SignedMessage> message, ServerPlayerEntity sender, RegistryKey<MessageType> typeKey) {
-            MutableText text = Text.literal("");
-            text.append(Text.literal(this.player.getName().getString()).styled(style -> style.withColor(Formatting.AQUA)));
-            text.append(Text.literal(" » ").styled(style -> style.withColor(Formatting.DARK_GRAY)));
-            text.append(Text.literal(message.raw().getContent().getString()).styled(style -> style.withColor(Formatting.WHITE)));
-            this.server.getPlayerManager().broadcast(text, MessageType.CHAT);
+            MutableText text = Text.literal("[MC]").styled(style -> style.withColor(Formatting.DARK_GREEN).withBold(true));
+            text.append(Text.literal(this.player.getName().getString()).styled(style -> style.withColor(Formatting.AQUA).withBold(false)));
+            text.append(Text.literal(" » ").styled(style -> style.withColor(Formatting.DARK_GRAY).withBold(false)));
+            text.append(Text.literal(message.raw().getContent().getString()).styled(style -> style.withColor(Formatting.WHITE).withBold(false)));
+            this.server.getPlayerManager().broadcast(text, MessageType.SYSTEM);
         }
 
     }
@@ -54,7 +54,7 @@ public class ChatMixin {
         @ModifyArg(method = "onPlayerConnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Lnet/minecraft/util/registry/RegistryKey;)V"))
         public Text onJoinMsg(Text message) {
             String[] old = message.getString().split("[ ]");
-            MutableText finalMsg = Text.literal("[+] ").styled(style -> style.withColor(Formatting.DARK_GREEN).withBold(true));
+            MutableText finalMsg = Text.literal("[+]").styled(style -> style.withColor(Formatting.DARK_GREEN).withBold(true));
             int i= 0;
             StringBuilder name = new StringBuilder();
             while (!old[i].equals("joined")) {
@@ -71,7 +71,7 @@ public class ChatMixin {
         @ModifyArg(method = "onDeath", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Lnet/minecraft/util/registry/RegistryKey;)V"))
         public Text onDeathMsg(Text message) {
             String[] old = message.getString().split("[ ]");
-            MutableText finalMsg = Text.literal("[*] ").styled(style -> style.withColor(Formatting.GRAY).withBold(true));
+            MutableText finalMsg = Text.literal("[*]").styled(style -> style.withColor(Formatting.GRAY).withBold(true));
             String name = old[0];
             StringBuilder deathmsg = new StringBuilder(" ");
             for (int i = 1; i < old.length; i++) {
