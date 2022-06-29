@@ -13,6 +13,8 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import javax.security.auth.login.LoginException;
+
 
 public class DiscordCommand {
 
@@ -21,23 +23,23 @@ public class DiscordCommand {
         dispatcher.register(literal("discord")
                 .then(CommandManager.literal("setBot")
                         .then(CommandManager.argument("token", StringArgumentType.string())
-                            .then(CommandManager.argument("channelId", StringArgumentType.string())
-                                .executes(context -> setup(context.getSource(), StringArgumentType.getString(context, "token"), StringArgumentType.getString(context, "channelId")))))
-                            .then(CommandManager.literal("start")
-                                .executes(context -> start(context.getSource())))
-                            .then(CommandManager.literal("stop")
-                                .executes(context -> stop(context.getSource())))));
+                        .then(CommandManager.argument("channelId", StringArgumentType.string())
+                                .executes(context -> setup(context.getSource(), StringArgumentType.getString(context, "token"), StringArgumentType.getString(context, "channelId"))))))
+                .then(CommandManager.literal("start")
+                        .executes(context -> start(context.getSource())))
+                .then(CommandManager.literal("stop")
+                        .executes(context -> stop(context.getSource()))));
     }
 
     public static int setup(ServerCommandSource source, String token, String channelId) {
         MutableText finalMsg = Text.literal("");
         if (DiscordListener.chatBridge){
             finalMsg.append(Text.literal("[WARN]: ").styled(style -> style.withColor(Formatting.GOLD).withBold(true)));
-            finalMsg.append(Text.literal("Stop the server before making any changes").styled(style -> style.withColor(Formatting.YELLOW)));
+            finalMsg.append(Text.literal("Stop the bot before you setup any changes").styled(style -> style.withColor(Formatting.YELLOW)));
         } else {
             JSONFile.addInFile(token, channelId);
             finalMsg.append(Text.literal("[INFO]: ").styled(style -> style.withColor(Formatting.GREEN).withBold(true)));
-            finalMsg.append(Text.literal("Done, you set the bot \"****\" to the channel \"#****\"").styled(style -> style.withColor(Formatting.GRAY)));
+            finalMsg.append(Text.literal("Done! Now you can start the bot").styled(style -> style.withColor(Formatting.GRAY)));
         }
         source.sendFeedback(finalMsg, false);
         return 1;
@@ -48,14 +50,21 @@ public class DiscordCommand {
         String[] data = JSONFile.getDataFile();
         if (!DiscordListener.chatBridge){
             try {
+                DiscordListener.connect(source.getServer(), data[0], data[1]);
                 finalMsg.append(Text.literal("[INFO]: ").styled(style -> style.withColor(Formatting.GREEN).withBold(true)));
                 finalMsg.append(Text.literal("Discord integration is running").styled(style -> style.withColor(Formatting.GRAY)));
-                DiscordListener.connect(source.getServer(), data[0], data[1]);
                 source.sendFeedback(finalMsg, false);
-
-            } catch (Exception e) {
+            } catch (LoginException e) {
                 finalMsg.append(Text.literal("[ERROR]: ").styled(style -> style.withColor(Formatting.DARK_RED).withBold(true)));
-                finalMsg.append(Text.literal("Unable to start the process, check the token").styled(style -> style.withColor(Formatting.RED)));
+                finalMsg.append(Text.literal("Unable to login to discord, check the token").styled(style -> style.withColor(Formatting.RED)));
+                source.sendFeedback(finalMsg, false);
+            } catch (InterruptedException e) {
+                finalMsg.append(Text.literal("[ERROR]: ").styled(style -> style.withColor(Formatting.DARK_RED).withBold(true)));
+                finalMsg.append(Text.literal("Unexpected error has occured").styled(style -> style.withColor(Formatting.RED)));
+                source.sendFeedback(finalMsg, false);
+            } catch (IllegalArgumentException e) {
+                finalMsg.append(Text.literal("[ERROR]: ").styled(style -> style.withColor(Formatting.DARK_RED).withBold(true)));
+                finalMsg.append(Text.literal("Unable to login to discord, check the channelId").styled(style -> style.withColor(Formatting.RED)));
                 source.sendFeedback(finalMsg, false);
             }
         } else {

@@ -27,6 +27,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import javax.security.auth.login.LoginException;
+
 
 public class DiscordMixin {
 
@@ -40,8 +42,10 @@ public class DiscordMixin {
                 // here you put the DiscordBot token and the channel Id where you want to use as a bridge
                 String[] data = JSONFile.getDataFile();
                 DiscordListener.connect((MinecraftServer) (Object) this, data[0], data[1]);
-            } catch (Exception e) {
-                System.err.println("[ERROR]: File not created");
+            } catch (LoginException | InterruptedException e) {
+                System.err.println("[ERROR]: The bot could not connect");
+            } catch (IllegalArgumentException e) {
+                System.err.println("[ERROR]: Bot connected, but wrong channel");
             }
         }
 

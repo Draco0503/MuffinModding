@@ -16,14 +16,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 
+import javax.security.auth.login.LoginException;
 import java.awt.*;
 import java.util.Objects;
 
 public class DiscordListener extends ListenerAdapter {
 
     private static JDA bot = null;
-    public static String token = "";
-    public static String channelId = "";
+    private static TextChannel channel = null;
     public static boolean chatBridge = false;
 
     private MinecraftServer ms;
@@ -32,18 +32,18 @@ public class DiscordListener extends ListenerAdapter {
         this.ms = ms;
     }
 
-    public static void connect(MinecraftServer m, String tk, String chId) {
-        token = tk;
-        channelId = chId;
-        try {
-            chatBridge = false;
-            bot = JDABuilder.createDefault(token).addEventListeners(new DiscordListener(m)).build();
-            bot.awaitReady();
-            chatBridge = true;
-
-        } catch (Exception e) {
-            System.err.println("[ERROR]: bot not set yet");
+    public static void connect(MinecraftServer m, String tk, String chId) throws LoginException, InterruptedException, IllegalArgumentException {
+        chatBridge = false;
+        bot = JDABuilder.createDefault(tk).addEventListeners(new DiscordListener(m)).build();
+        bot.awaitReady();
+        channel = bot.getTextChannelById(chId);
+        if (channel == null) {
+            stop();
+            throw new IllegalArgumentException();
         }
+        chatBridge = true;
+
+
     }
 
     @Override
@@ -54,7 +54,7 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (chatBridge && event.getChannel().getId().equals(channelId)) {
+        if (chatBridge && event.getChannel().equals(channel)) {
             if (event.getAuthor().isBot()) return;
             if (event.getMessage().getContentDisplay().equals("!online")) {
                 StringBuilder msg = new StringBuilder();
@@ -82,14 +82,8 @@ public class DiscordListener extends ListenerAdapter {
     }
 
     public static void sendMessage(String msg){
-        if (chatBridge){
-            try {
-                TextChannel ch = bot.getTextChannelById(channelId);
-                if (ch != null) ch.sendMessage(msg).queue();
-            }
-            catch (Exception e){
-                System.err.println("[ERROR]: Wrong channelId");
-            }
+        if (chatBridge && channel != null){
+            channel.sendMessage(msg);
         }
     }
     public EmbedBuilder embedMsg(String msg) {
