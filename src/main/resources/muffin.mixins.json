@@ -1,0 +1,21 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.muffin.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "discord.ChatMixin$PlayerManagerMixin",
+    "discord.ChatMixin$ServerPlayerEntityMixin",
+    "discord.ChatMixin$ServerPlayNetworkMixin",
+    "discord.DiscordMixin$DiscordChatMixin",
+    "discord.DiscordMixin$DiscordCommandMixin",
+    "discord.DiscordMixin$DiscordDeathMixin",
+    "discord.DiscordMixin$DiscordJoinMixin",
+    "discord.DiscordMixin$DiscordRunMixin"
+  ],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
